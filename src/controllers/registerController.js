@@ -21,7 +21,7 @@ const createUser = async (req, res) => {
         } else {
             let encryptedPassword = password;
             if (password) {
-                encryptedPassword = CryptoJS.AES.encrypt(password, process.env.SECRET_PASS).toString();
+                encryptedPassword = CryptoJS.AES.encrypt(password, process.env.SECRET_KEY.toString());
             }
             const newUser = await User.create({
                 role,
@@ -40,6 +40,9 @@ const createUser = async (req, res) => {
 
 // ===============GET ALL USER===================
 const getAllUser = async (req, res) => {
+    const user = req.user
+    console.log("user getAllUser", user);
+
     try {
         const getAllUser = await User.find({})
         res.status(200).json({ getAllUser });

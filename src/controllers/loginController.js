@@ -11,7 +11,7 @@ const handleLogin = async (req, res) => {
         }
         const hashedPassword = CryptoJS.AES.decrypt(
             user.password,
-            process.env.SECRET_PASS
+            process.env.SECRET_KEY
         ).toString(CryptoJS.enc.Utf8);
 
         if (hashedPassword === req.body.password) {
@@ -22,7 +22,7 @@ const handleLogin = async (req, res) => {
                     userName: user.userName,
                     email: user.email,
                 },
-                process.env.SECRET_PASS,
+                process.env.SECRET_KEY,
             );
             res.cookie('tokenRestaurants', tokenJWT);
             return res.status(200).json({ message: 'Login successful' });

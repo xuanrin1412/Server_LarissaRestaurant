@@ -1,6 +1,5 @@
 const express = require("express")
 const { createOrder, deleteOrder, getAllOrder, getOneOrder, updateOrder } = require("../controllers/orderController")
-
 const router = express.Router()
 
 router.post("/", createOrder)

@@ -10,6 +10,7 @@ const registerRouter = require("./src/routers/registerRouter")
 const categoryRouter = require("./src/routers/categoryRouter")
 const foodRouter = require("./src/routers/foodRouter")
 const areaRouter = require("./src/routers/areaRouter")
+const tableRouter = require("./src/routers/tableRouter")
 // const orderRouter = require("./src/routers/orderRouter")
 
 const app = express()
@@ -40,6 +41,7 @@ app.use("/api/register", registerRouter)
 app.use("/api/category", categoryRouter)
 app.use("/api/food", foodRouter)
 app.use("/api/area", areaRouter)
+app.use("/api/table", tableRouter)
 // app.use("/api/order", orderRouter)
 
 app.listen(port, () => {

@@ -1,19 +1,32 @@
 const mongoose = require("mongoose")
-const areaSchema = new mongoose.Schema({
+const orderSchema = new mongoose.Schema({
     userId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         require: true,
         unique: true,
     },
-    userId: {
-        type: String,
+    tableId: {
+        type: mongoose.Schema.Types.ObjectId | null,
         require: true,
         unique: true,
+    },
+    shipAdress: {
+        type: String
+    },
+    totalFoodOrder: {
+        type: String
     },
     ship: {
-
+        type: String
+    },
+    note: {
+        type: String
+    },
+    status: {
+        require: true,
+        type: String
     }
 }, {
     timestamps: true
 })
-module.exports = mongoose.model("area", areaSchema)
+module.exports = mongoose.model("order", orderSchema)

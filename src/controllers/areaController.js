@@ -1,4 +1,5 @@
 const Area = require("../models/areaModel")
+const Table = require("../models/tableModel")
 // var CryptoJS = require("crypto-js")
 // const jwt = require('jsonwebtoken')
 
@@ -58,4 +59,34 @@ const updateArea = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 }
-module.exports = { createArea, getAllArea, getOneArea, deleteArea, updateArea }
+
+
+
+
+
+
+// Helper function to populate area details efficiently
+const populateTableDetails = async (areaId) => {
+    const tableDocs = await Table.find({ idArea: areaId })
+        .select('-idArea'); // Exclude unnecessary field
+    return tableDocs;
+};
+
+// API endpoint to retrieve categories with populated food (using async/await)
+const getAreaWithTable = async (req, res) => {
+    try {
+        const areas = await Area.find();
+        const populatedAreas = await Promise.all(
+            areas.map(async (area) => ({
+                areaName: area.areaName,
+                table: await populateTableDetails(area._id),
+            }))
+        );
+        console.log(populatedAreas);
+        res.json(populatedAreas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error fetching Category with Food' });
+    }
+}
+module.exports = { getAreaWithTable, createArea, getAllArea, getOneArea, deleteArea, updateArea }

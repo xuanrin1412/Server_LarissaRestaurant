@@ -78,7 +78,7 @@ const updateFood = async (req, res) => {
 const getFoodFromCategory = async (req, res) => {
     const idCategory = req.params.idCategory
     try {
-        await Food.find({ idCategory: idCategory })
+        await Food.find({ idCategory })
             .populate('idCategory', 'categoryName') // Chỉ lấy trường categoryName từ danh mục
             .then(foods => {
                 console.log(foods); // Danh sách các món ăn với thông tin danh mục (chỉ categoryName)

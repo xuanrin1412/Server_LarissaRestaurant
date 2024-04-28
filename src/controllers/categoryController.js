@@ -69,13 +69,11 @@ const getCategoryWithFood = async (req, res) => {
                 food: await populateFoodDetails(category._id),
             }))
         );
-
         console.log(populatedCategories);
-
         res.json(populatedCategories);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error fetching categories and food' });
+        res.status(500).json({ message: 'Error fetching Category with Food' });
     }
 }
 module.exports = { createCategory, getAllCategory, deleteCategory, updateCategory, getCategoryWithFood }

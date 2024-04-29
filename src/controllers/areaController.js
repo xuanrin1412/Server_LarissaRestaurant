@@ -66,9 +66,9 @@ const updateArea = async (req, res) => {
 
 
 // Helper function to populate area details efficiently
-const populateTableDetails = async (areaId) => {
-    const tableDocs = await Table.find({ idArea: areaId })
-        .select('-idArea'); // Exclude unnecessary field
+const populateTableDetails = async (idArea) => {
+    const tableDocs = await Table.find({ areaId: idArea })
+        .select('-areaId'); // Exclude unnecessary field
     return tableDocs;
 };
 

@@ -6,18 +6,22 @@ const jwt = require('jsonwebtoken')
 const createUser = async (req, res) => {
     const { userName } = req.body
     const { email } = req.body
+    const { phoneNumber } = req.body
     const { password } = req.body
     const { role } = req.body
     try {
-        if (!userName || userName.trim().length === 0 || !email || email.trim().length === 0 || !password || password.trim().length === 0) {
+        if (!userName || userName.trim().length === 0 || !email || email.trim().length === 0 || !password || password.trim().length === 0 || !phoneNumber || phoneNumber.length === 0) {
             return res.status(400).json({ message: "Please enter all required information" });
         }
         const userEmail = await User.findOne({ email })
         const userNameD = await User.findOne({ userName })
+        const userPhoneD = await User.findOne({ phoneNumber })
         if (userEmail) {
             return res.status(400).json({ message: 'Email đã tồn tại' })
         } else if (userNameD) {
             return res.status(400).json({ message: 'User Name đã tồn tại' })
+        } else if (userPhoneD) {
+            return res.status(400).json({ message: 'Phone Number đã tồn tại' })
         } else {
             let encryptedPassword = password;
             if (password) {
@@ -27,6 +31,7 @@ const createUser = async (req, res) => {
                 role,
                 userName,
                 email,
+                phoneNumber,
                 password: encryptedPassword
             });
             res.status(200).json({ newUser, message: 'Register successful' })

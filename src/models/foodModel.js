@@ -1,15 +1,20 @@
 const mongoose = require("mongoose")
 const foodSchema = new mongoose.Schema({
+    categoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'category',
+        required: true
+    },
     foodName: {
         type: String,
         require: true,
         unique: true,
     },
-    picture: {
+    description: {
         type: String,
         require: true,
     },
-    description: {
+    picture: {
         type: String,
         require: true,
     },
@@ -17,7 +22,7 @@ const foodSchema = new mongoose.Schema({
         type: Number,
         require: true,
     },
-    sellingPrice: {
+    revenue: {
         type: Number,
         require: true,
     },
@@ -25,11 +30,6 @@ const foodSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    idCategory: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'category',
-        required: true
-    }
 }, {
     timestamps: true
 })

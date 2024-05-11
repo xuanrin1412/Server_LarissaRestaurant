@@ -25,7 +25,7 @@ const handleLogin = async (req, res) => {
                 process.env.SECRET_KEY,
             );
             res.cookie('tokenRestaurants', tokenJWT);
-            return res.status(200).json({ message: 'Login successful' });
+            return res.status(200).json({ tokenJWT, message: 'Login successful' });
         } else {
             return res.status(400).json({
                 message: 'Failed to login. Check your password !!!',

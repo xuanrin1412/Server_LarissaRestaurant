@@ -7,18 +7,18 @@ const createFood = async (req, res) => {
     const { picture } = req.body
     const { description } = req.body
     const { costPrice } = req.body
-    const { sellingPrice } = req.body
+    const { revenue } = req.body
     const { favourite } = req.body
-    const { idCategory } = req.body
+    const { categoryId } = req.body
     try {
         const newFood = await Food.create({
             foodName,
             picture,
             description,
             costPrice,
-            sellingPrice,
+            revenue,
             favourite,
-            idCategory,
+            categoryId,
         })
         res.status(200).json({ message: "Created Food Successfull", newFood })
     } catch (error) {
@@ -29,7 +29,7 @@ const createFood = async (req, res) => {
 const getAllFood = async (req, res) => {
     try {
         await Food.find({})
-            .populate('idCategory', 'categoryName') // Chỉ lấy trường categoryName từ danh mục
+            .populate('categoryId', 'categoryName') // Chỉ lấy trường categoryName từ danh mục
             .then(foods => {
                 console.log(foods); // Danh sách các món ăn với thông tin danh mục (chỉ categoryName)
                 return res.status(200).json({ foods })
@@ -75,22 +75,22 @@ const updateFood = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 }
-const getFoodFromCategory = async (req, res) => {
-    const idCategory = req.params.idCategory
-    try {
-        await Food.find({ idCategory })
-            .populate('idCategory', 'categoryName') // Chỉ lấy trường categoryName từ danh mục
-            .then(foods => {
-                console.log(foods); // Danh sách các món ăn với thông tin danh mục (chỉ categoryName)
-                return res.status(200).json({ foods })
-            })
-            .catch(err => {
-                console.error(err);
-            });
+// const getFoodFromCategory = async (req, res) => {
+//     const idCategory = req.params.idCategory
+//     try {
+//         await Food.find({ idCategory })
+//             .populate('categoryId', 'categoryName') // Chỉ lấy trường categoryName từ danh mục
+//             .then(foods => {
+//                 console.log(foods); // Danh sách các món ăn với thông tin danh mục (chỉ categoryName)
+//                 return res.status(200).json({ foods })
+//             })
+//             .catch(err => {
+//                 console.error(err);
+//             });
 
-    } catch (error) {
-        console.error("Error:", error);
-        return res.status(500).json({ error: error.message });
-    }
-}
-module.exports = { createFood, getAllFood, deleteFood, updateFood, getOneFood, getFoodFromCategory }
+//     } catch (error) {
+//         console.error("Error:", error);
+//         return res.status(500).json({ error: error.message });
+//     }
+// }
+module.exports = { createFood, getAllFood, deleteFood, updateFood, getOneFood }

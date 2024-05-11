@@ -53,9 +53,9 @@ const updateCategory = async (req, res) => {
 
 
 // Helper function to populate food details efficiently
-const populateFoodDetails = async (categoryId) => {
-    const foodDocs = await Food.find({ idCategory: categoryId })
-        .select('-idCategory'); // Exclude unnecessary field
+const populateFoodDetails = async (idCategory) => {
+    const foodDocs = await Food.find({ categoryId: idCategory })
+        .select('-categoryId'); // Exclude unnecessary field
     return foodDocs;
 };
 

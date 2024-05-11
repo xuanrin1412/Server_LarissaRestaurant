@@ -1,32 +1,39 @@
 const mongoose = require("mongoose")
+const statusArray = ["Wait for the dish", "Wait for payment", "Cancel", "Completes"]
 const orderSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        require: true,
-        unique: true,
+        ref: "Users", // Reference the Users model
+        required: true,
     },
     tableId: {
-        type: mongoose.Schema.Types.ObjectId | null,
+        type: mongoose.Schema.Types.ObjectId,
         require: true,
-        unique: true,
     },
     shipAdress: {
         type: String
     },
-    totalFoodOrder: {
-        type: String
+    subTotal: {
+        type: Number,
+        // require: true
     },
-    ship: {
+    deliveryFee: {
         type: String
     },
     note: {
         type: String
     },
+    discount: {
+        type: Number
+    },
     status: {
-        require: true,
-        type: String
+        type: String,
+        enum: statusArray,
+        default: "Wait for the dish"
     }
 }, {
     timestamps: true
 })
+// orderSchema.index({ orderId: 1 }, { unique: true });
+module.exports = { statusArray }
 module.exports = mongoose.model("order", orderSchema)

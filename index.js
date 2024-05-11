@@ -11,7 +11,8 @@ const categoryRouter = require("./src/routers/categoryRouter")
 const foodRouter = require("./src/routers/foodRouter")
 const areaRouter = require("./src/routers/areaRouter")
 const tableRouter = require("./src/routers/tableRouter")
-// const orderRouter = require("./src/routers/orderRouter")
+// const orderRouter = require("./src/routers/orderRouter") 
+const order_FoodRouter = require("./src/routers/order_FoodRouter")
 
 const app = express()
 const port = 3004;
@@ -43,6 +44,7 @@ app.use("/api/food", foodRouter)
 app.use("/api/area", areaRouter)
 app.use("/api/table", tableRouter)
 // app.use("/api/order", orderRouter)
+app.use("/api/order_food", order_FoodRouter)
 
 app.listen(port, () => {
     console.log("CONNECTED TO BE");

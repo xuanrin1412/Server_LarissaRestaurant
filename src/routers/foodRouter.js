@@ -8,7 +8,7 @@ router.delete("/:idFood", deleteFood)
 router.get("/", getAllFood)
 router.put("/:idFood", updateFood)
 router.get("/find/:idFood", getOneFood)
-router.get("/findFoodFCategory/:idCategory", getFoodFromCategory)
+// router.get("/findFoodFCategory/:idCategory", getFoodFromCategory)
 
 
 module.exports = router

@@ -36,7 +36,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
+app.get("/", (req, res) => res.send("Express on Vercel"));
 app.use("/api/login", loginRouter)
 app.use("/api/register", registerRouter)
 app.use("/api/category", categoryRouter)

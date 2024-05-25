@@ -50,3 +50,5 @@ app.listen(port, () => {
     console.log("CONNECTED TO BE");
 })
 
+
+module.exports = app;

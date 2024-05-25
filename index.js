@@ -15,7 +15,7 @@ const tableRouter = require("./src/routers/tableRouter")
 const order_FoodRouter = require("./src/routers/order_FoodRouter")
 
 const app = express()
-const port = 3004;
+const port = 3000;
 
 mongoose.connect(process.env.MONGODB_NAME)
     .then(() => {

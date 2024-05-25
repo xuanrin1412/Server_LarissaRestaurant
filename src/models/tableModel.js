@@ -13,7 +13,8 @@ const tableSchema = new mongoose.Schema({
     capacity: {
         type: Number,
         require: true,
-    }
+    },
+    
 }, {
     timestamps: true,
     // unique: { // Unique constraint for tableName and areaId combined

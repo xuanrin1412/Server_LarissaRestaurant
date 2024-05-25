@@ -6,42 +6,52 @@ const User = require("../models/userModel");
 
 const createOrder = async (req, res) => {
     const { userId, tableId, note, status, foods, discount } = req.body;
-
+    console.log("===========",userId,tableId,foods);
+    
     try {
         const user = await User.findOne({ _id: userId });
+        let total = 0
         if (user.role === "moderator") {
-            // Calculate subTotal
-            let accumulatedSubTotal = 0;
-            for (const food of foods) {
-                const foodPrice = await Food.findById(food._id).select('revenue');
-                accumulatedSubTotal += foodPrice.revenue * food.quantity;
-            }
             // order
             const newOrder = await Order.create({
                 userId,
                 tableId,
-                subTotal: accumulatedSubTotal,
+                subTotal: total,
                 discount,
                 note,
                 status,
             });
             // add food
             const orderId = newOrder._id.toHexString();
+            for (const food of foods) {
+                const foodId = food._id
+                const test = await OrderFood.findById(foodId)
+                total += test
+            }
             const addFoodPromises = foods.map(async food => {
-
+                const foodData = await Food.findById(food._id);
+                const totalEachFood = foodData.revenue * food.quantity;
+                total += totalEachFood;
                 return OrderFood.create({
                     foodId: food._id,
                     orderId: orderId,
                     quantity: food.quantity,
+                    totalEachFood: totalEachFood,
                     note,
                 });
             });
             const foodsArr = await Promise.all(addFoodPromises);
+            await Order.findByIdAndUpdate(orderId, { subTotal: total });
+
             const populatedFoodsArr = await OrderFood.find({ orderId: orderId }).populate('foodId');
+            const populatedNewOrder = await Order.find({ tableId: tableId }).populate({
+                path: 'userId',
+                select: '-password' 
+            });
             console.log("foodsArr", foodsArr)
             res.status(200).json({
                 message: "Created order Successfully OFFLINE",
-                newOrder,
+                newOrder: populatedNewOrder,
                 foodsArr: populatedFoodsArr
             });
         } else {
@@ -55,12 +65,49 @@ const createOrder = async (req, res) => {
 
 const getAllOrder = async (req, res) => {
     try {
-        const getAllOrder = await Order.find({})
-        res.status(200).json({ getAllOrder })
+        const orders = await Order.find().populate('userId');
+        const detailedOrders = await Promise.all(orders.map(async order => {
+            const foods = await OrderFood.find({ orderId: order._id }).populate('foodId');
+            return {
+                ...order.toObject(),
+                foods
+            };
+        }));
+        res.status(200).json({
+            message: "Fetched all orders successfully",
+            orders: detailedOrders
+        });
     } catch (error) {
-
+        console.error(error);
+        res.status(500).json({ message: "Error fetching orders" });
     }
-}
+};
+
+const getOrderFromTable = async (req, res) => {
+    const idTable = req.params.idTable
+    try {
+        const orderFromTable = await Order.find({ tableId: idTable }).populate([
+            { path: 'userId' },
+            { path: 'tableId' }
+        ]);
+        const detailedOrders = await Promise.all(orderFromTable.map(async order => {
+            const foods = await OrderFood.find({ orderId: order._id }).populate('foodId');
+            return {
+                ...order.toObject(),
+                foods
+            };
+        }));
+        res.status(200).json({
+            message: "Fetched one order from table successfully",
+            getOrderFromTable: detailedOrders
+        });
+        console.log({orderFromTable,detailedOrders})
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error fetching getOrderFromTable" });
+    }
+};
+
 
 const inscreaseQuantity = async (req, res) => {
     const idOrderFood = req.params.idOrderFood;  // Assuming ID is in request parameters
@@ -165,4 +212,4 @@ const getOneOrder = async (req, res) => {
 // }
 
 
-module.exports = { createOrder, getAllOrder, updateStatus, getOneOrder, inscreaseQuantity }
+module.exports = { createOrder, getAllOrder,getOrderFromTable, updateStatus, getOneOrder, inscreaseQuantity }

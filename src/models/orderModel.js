@@ -8,6 +8,7 @@ const orderSchema = new mongoose.Schema({
     },
     tableId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "table", 
         require: true,
     },
     shipAdress: {

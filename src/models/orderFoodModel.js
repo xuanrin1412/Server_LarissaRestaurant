@@ -14,7 +14,10 @@ const orderFoodSchema = new mongoose.Schema({
     quantity: {
         type: Number,
         require: true
-
+    },
+    totalEachFood: {
+        type: Number,
+        require: true
     },
     note: {
         type: String

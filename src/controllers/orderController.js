@@ -91,8 +91,6 @@ const updateOrder = async (req, res) => {
 
 
 
-
-
 // Helper function to populate food details efficiently
 const populateFoodDetails = async (idCategory) => {
     const foodDocs = await Food.find({ categoryId: idCategory })

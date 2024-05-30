@@ -74,6 +74,7 @@ const populateTableDetails = async (idArea) => {
 
 // API endpoint to retrieve categories with populated food (using async/await)
 const getAreaWithTable = async (req, res) => {
+    const io = req.io;
     try {
         const areas = await Area.find();
         const populatedAreas = await Promise.all(
@@ -83,6 +84,9 @@ const getAreaWithTable = async (req, res) => {
             }))
         );
         console.log(populatedAreas);
+        io.emit('area_with_table', {
+            populatedAreas
+        });
         res.json(populatedAreas);
     } catch (error) {
         console.error(error);

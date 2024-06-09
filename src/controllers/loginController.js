@@ -20,7 +20,9 @@ const handleLogin = async (req, res) => {
                     id: user._id,
                     role: user.role,
                     userName: user.userName,
-                    email: user.email,
+                    // email: user.email,
+                    // phoneNumber: user.phoneNumber,
+                    // address: user.address,
                 },
                 process.env.SECRET_KEY,
             );

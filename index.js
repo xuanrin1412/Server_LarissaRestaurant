@@ -67,10 +67,10 @@ app.use("/api/order_food", order_FoodRouter);
 
 io.on('connection', (socket) => {
     console.log(`User Connected: ${socket.id}`);
-    socket.on('join_admin_room', (adminId) => {
-        socket.join('admin_room');
-        console.log(`-----------------------------------Admin ${adminId} joined admin room`);
-      });
+    // socket.on('join_admin_room', (adminId) => {
+    //     socket.join('admin_room');
+    //     console.log(`-----------------------------------Admin ${adminId} joined admin room`);
+    //   });
     socket.on('disconnect', () => {
       console.log('User disconnected');
     });

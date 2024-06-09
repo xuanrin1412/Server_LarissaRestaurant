@@ -8,9 +8,10 @@ const createUser = async (req, res) => {
     const { email } = req.body
     const { phoneNumber } = req.body
     const { password } = req.body
+    const { address } = req.body
     const { role } = req.body
     try {
-        if (!userName || userName.trim().length === 0 || !email || email.trim().length === 0 || !password || password.trim().length === 0 || !phoneNumber || phoneNumber.length === 0) {
+        if (!userName || userName.trim().length === 0 || !email || email.trim().length === 0 || !password || password.trim().length === 0 || !phoneNumber || phoneNumber.length === 0 || !address || address.length === 0) {
             return res.status(400).json({ message: "Please enter all required information" });
         }
         const userEmail = await User.findOne({ email })
@@ -32,6 +33,7 @@ const createUser = async (req, res) => {
                 userName,
                 email,
                 phoneNumber,
+                address,
                 password: encryptedPassword
             });
             res.status(200).json({ newUser, message: 'Register successful' })

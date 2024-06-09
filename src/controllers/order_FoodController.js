@@ -11,7 +11,7 @@ const createOrder = async (req, res) => {
     try {
         const user = await User.findOne({ _id: userId });
         let total = 0
-        if (user.role === "moderator"||"admin") {
+        if (user.role === "moderator" || "admin") {
             // order
             const newOrder = await Order.create({
                 userId,
@@ -49,7 +49,7 @@ const createOrder = async (req, res) => {
                 select: '-password'
             });
             console.log("foodsArr", foodsArr)
-            io.to('admin_room').emit('new_order', {
+            io.emit('new_order', {
                 message: "Table have Order"
             });
             res.status(200).json({
@@ -143,25 +143,57 @@ const getOneOrder = async (req, res) => {
     }
 }
 
-const updateOrder = async (res, req) => {
-    const idOrder = res.params.idOrder
-    const updateOrder = await Order.findOne({ _id: idOrder })
+// lấy ra id order -> biết được đang ở order nào  find one and update trả về order and (food được update  thêm xóa giảm )
+const updateOrder = async (req, res) => {
+    const idOrder = req.params.idOrder
+    const listIdRemoveFoods = req.body.listIdRemoveFoods
+    const newOrderFoods = req.body.newOrderFoods
+    const listUpdateQuanFoods = req.body.listUpdateQuanFoods
+    const total = req.body.totalOrder
+
     try {
-        const detailedOrders = await Promise.all(orderFromTable.map(async order => {
-            const foods = await OrderFood.find({ orderId: order._id }).populate('foodId');
-            return {
-                ...order.toObject(),
-                foods
+        const oldFoods = await OrderFood.find({ orderId: idOrder })
+        const listOldFoods = oldFoods.map(item => item.foodId._id.toString())
+        const listAddNewFoods = newOrderFoods.filter(item => !listOldFoods.includes(item.foodId._id.toString()))
+        
+        const newFoods = []
+        for (const listAddNewFood of listAddNewFoods) {
+            const addNewFoodToOrder = await OrderFood.create({
+                foodId: listAddNewFood.foodId._id,
+                orderId: idOrder,
+                quantity: listAddNewFood.quantity,
+                totalEachFood: listAddNewFood.totalEachFood,
+            })
+            newFoods.push(addNewFoodToOrder)
+        }
+
+        for (const idRemoveFood of listIdRemoveFoods) {
+            await OrderFood.findOneAndDelete({ foodId: idRemoveFood, orderId: idOrder })
+        }
+
+        let updateFoodsApi = []
+        for (const updateQuanFood of listUpdateQuanFoods) {
+            console.log("updateQuanFood==>", updateQuanFood.quan);
+            const filter = {
+                orderId: idOrder,
+                foodId: updateQuanFood.foodInfo._id,
             };
-        }));
-        res.status(200).json({
-            message: "Fetched one order from table successfully",
-            getOrderFromTable: detailedOrders
+            const update = { quantity: updateQuanFood.quan, totalEachFood: updateQuanFood.totalEachFood };
+            const updateFoods = await OrderFood.findOneAndUpdate(filter, update, {
+                new: true
+            })
+            updateFoodsApi.push(updateFoods)
+        }
+
+        await Order.findOneAndUpdate({_id:idOrder}, { subTotal: total },{
+            new: true
         });
-        console.log({ orderFromTable, detailedOrders })
+
+        res.status(200).json({total, updateFoodsApi, listUpdateQuanFoods, oldFoods, listOldFoods, listAddNewFoods, newFoods, listIdRemoveFoods })
+
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error fetching getOrderFromTable" });
+        res.status(500).json({ message: "Fail update updateOrder" });
     }
 }
 

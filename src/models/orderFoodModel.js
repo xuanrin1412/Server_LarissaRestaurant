@@ -19,9 +19,5 @@ const orderFoodSchema = new mongoose.Schema({
         type: Number,
         require: true
     },
-    note: {
-        type: String
-    }
-
 })
 module.exports = mongoose.model("orderFood", orderFoodSchema)

@@ -8,7 +8,7 @@ const orderSchema = new mongoose.Schema({
     },
     tableId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "table", 
+        ref: "table",
         require: true,
     },
     shipAdress: {
@@ -31,7 +31,7 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: statusArray,
         default: "Wait for the dish"
-    }
+    },
 }, {
     timestamps: true
 })

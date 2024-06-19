@@ -7,7 +7,7 @@ const User = require("../models/userModel");
 const createOrder = async (req, res) => {
     const { userId, tableId, note, status, foods, discount } = req.body;
     const io = req.io;
-    console.log("===========", userId, tableId, foods);
+    console.log("===========", userId, tableId, foods, note);
     try {
         const user = await User.findOne({ _id: userId });
         let total = 0
@@ -37,9 +37,10 @@ const createOrder = async (req, res) => {
                     orderId: orderId,
                     quantity: food.quantity,
                     totalEachFood: totalEachFood,
-                    note,
                 });
             });
+            console.log("addFoodPromises================================================", addFoodPromises);
+
             const foodsArr = await Promise.all(addFoodPromises);
             await Order.findByIdAndUpdate(orderId, { subTotal: total });
 
@@ -155,7 +156,7 @@ const updateOrder = async (req, res) => {
         const oldFoods = await OrderFood.find({ orderId: idOrder })
         const listOldFoods = oldFoods.map(item => item.foodId._id.toString())
         const listAddNewFoods = newOrderFoods.filter(item => !listOldFoods.includes(item.foodId._id.toString()))
-        
+
         const newFoods = []
         for (const listAddNewFood of listAddNewFoods) {
             const addNewFoodToOrder = await OrderFood.create({
@@ -185,16 +186,24 @@ const updateOrder = async (req, res) => {
             updateFoodsApi.push(updateFoods)
         }
 
-        await Order.findOneAndUpdate({_id:idOrder}, { subTotal: total },{
-            new: true
-        });
-
-        res.status(200).json({total, updateFoodsApi, listUpdateQuanFoods, oldFoods, listOldFoods, listAddNewFoods, newFoods, listIdRemoveFoods })
-
+        res.status(200).json({ total, updateFoodsApi, listUpdateQuanFoods, oldFoods, listOldFoods, listAddNewFoods, newFoods, listIdRemoveFoods })
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Fail update updateOrder" });
     }
 }
 
-module.exports = { createOrder, getAllOrder, getOrderFromTable, updateStatus, getOneOrder, updateOrder }
+const updateNote = async (req, res) => {
+    const idOrder = req.params.idOrder
+    const note = req.body.note
+    try {
+        const updateNote = await Order.findOneAndUpdate({ _id: idOrder }, { note: note }, {
+            new: true
+        });
+        res.status(200).json({ updateNote })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error fetching updateNote " });
+    }
+}
+module.exports = { createOrder, getAllOrder, getOrderFromTable, updateStatus, getOneOrder, updateOrder, updateNote }

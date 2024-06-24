@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const statusArray = ["Wait for the dish", "Wait for payment", "Cancel", "Completes"]
 const orderSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -27,14 +26,11 @@ const orderSchema = new mongoose.Schema({
     discount: {
         type: Number
     },
-    status: {
-        type: String,
-        enum: statusArray,
-        default: "Wait for the dish"
+    statusPayment: {
+        type: Boolean,
+        default: false,
     },
 }, {
     timestamps: true
 })
-// orderSchema.index({ orderId: 1 }, { unique: true });
-module.exports = { statusArray }
 module.exports = mongoose.model("order", orderSchema)

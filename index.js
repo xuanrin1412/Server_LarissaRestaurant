@@ -11,7 +11,7 @@ const categoryRouter = require("./src/routers/categoryRouter");
 const foodRouter = require("./src/routers/foodRouter");
 const areaRouter = require("./src/routers/areaRouter");
 const tableRouter = require("./src/routers/tableRouter");
-// const orderRouter = require("./src/routers/orderRouter"); 
+const billRouter = require("./src/routers/billRouter");
 const order_FoodRouter = require("./src/routers/order_FoodRouter");
 
 const app = express();
@@ -62,7 +62,7 @@ app.use("/api/category", categoryRouter);
 app.use("/api/food", foodRouter);
 app.use("/api/area", areaRouter);
 app.use("/api/table", tableRouter);
-// app.use("/api/order", orderRouter);
+app.use("/api/bill", billRouter);
 app.use("/api/order_food", order_FoodRouter);
 
 io.on('connection', (socket) => {

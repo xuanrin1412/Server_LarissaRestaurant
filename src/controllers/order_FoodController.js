@@ -3,9 +3,10 @@ const Order = require("../models/OrderModel")
 const Food = require("../models/foodModel")
 const OrderFood = require("../models/orderFoodModel")
 const User = require("../models/userModel");
+const Table = require("../models/tableModel");
 
 const createOrder = async (req, res) => {
-    const { userId, tableId, note, status, foods, discount } = req.body;
+    const { userId, tableId, note, statusPayment, foods, discount } = req.body;
     const io = req.io;
     console.log("===========", userId, tableId, foods, note);
     try {
@@ -19,7 +20,7 @@ const createOrder = async (req, res) => {
                 subTotal: total,
                 discount,
                 note,
-                status,
+                statusPayment,
             });
             // add food
             const orderId = newOrder._id.toHexString();
@@ -50,8 +51,13 @@ const createOrder = async (req, res) => {
                 select: '-password'
             });
             console.log("foodsArr", foodsArr)
+
+            const table = await Table.findById({_id:tableId})
+            const tableName = table.tableName
+            // console.log("table=>",table.tableName);
+            
             io.emit('new_order', {
-                message: "Table have Order"
+                message: tableName + " have Order"
             });
             res.status(200).json({
                 message: "Created order Successfully OFFLINE",
@@ -70,7 +76,7 @@ const createOrder = async (req, res) => {
 const getAllOrder = async (req, res) => {
     const io = req.io;
     try {
-        const orders = await Order.find().populate('userId');
+        const orders = await Order.find({ statusPayment: false }).populate('userId');
         const detailedOrders = await Promise.all(orders.map(async order => {
             const foods = await OrderFood.find({ orderId: order._id }).populate('foodId');
             return {
@@ -125,6 +131,7 @@ const updateStatus = async (req, res) => {
     const newStatus = "Wait for payment";
     try {
         const updateStatus = await Order.findByIdAndUpdate({ _id: idOrder }, { $set: { status: newStatus } }, { new: true })
+
         res.status(200).json({ updateStatus })
     } catch (error) {
         console.error(error);
@@ -146,6 +153,7 @@ const getOneOrder = async (req, res) => {
 
 // lấy ra id order -> biết được đang ở order nào  find one and update trả về order and (food được update  thêm xóa giảm )
 const updateOrder = async (req, res) => {
+    const io = req.io;
     const idOrder = req.params.idOrder
     const listIdRemoveFoods = req.body.listIdRemoveFoods
     const newOrderFoods = req.body.newOrderFoods
@@ -185,7 +193,9 @@ const updateOrder = async (req, res) => {
             })
             updateFoodsApi.push(updateFoods)
         }
-
+        io.emit('new_order', {
+            message: "Table have Order"
+        });
         res.status(200).json({ total, updateFoodsApi, listUpdateQuanFoods, oldFoods, listOldFoods, listAddNewFoods, newFoods, listIdRemoveFoods })
     } catch (error) {
         console.error(error);

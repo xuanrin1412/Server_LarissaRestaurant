@@ -11,9 +11,8 @@ const billSchema = new mongoose.Schema({
         enum : ['cash','momo','bank'],
         default: 'cash'
     },
-    total: {
-        type: Number,
-        require: true
-    },
+    profit:{
+        type:Number,
+    }
 })
 module.exports = mongoose.model("bill", billSchema)

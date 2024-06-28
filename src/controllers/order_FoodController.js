@@ -203,6 +203,53 @@ const updateOrder = async (req, res) => {
     }
 }
 
+const getBestSellingDishes = async (req, res) => {
+    try {
+        const bestSellingDishes = await OrderFood.aggregate([
+            {
+                $group: {
+                    _id: "$foodId",
+                    totalSold: { $sum: "$quantity" } // Tổng số lượng bán ra
+                }
+            },
+            {
+                $sort: { totalSold: -1 } // Sắp xếp theo tổng số lượng bán ra giảm dần
+            },
+            // {
+            //     $limit: 15 // Lấy top 10 món ăn bán chạy nhất
+            // },
+            {
+                $lookup: {
+                    from: 'foods', // Tên collection foods
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'foodDetails'
+                }
+            },
+            {
+                $unwind: "$foodDetails" // Trải phẳng mảng foodDetails để lấy thông tin món ăn
+            },
+            {
+                $project: {
+                    _id: 0,
+                    foodId: "$_id",
+                    foodName: "$foodDetails.foodName",
+                    picture: "$foodDetails.picture",
+                    totalSold: 1 // Giữ lại giá trị của totalSold từ giai đoạn trước
+                }
+            }
+        ]);
+
+        res.status(200).json({
+            message: "Best Selling Dishes Retrieved Successfully",
+            bestSellingDishes: bestSellingDishes
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error retrieving best-selling dishes" });
+    }
+};
+
 const updateNote = async (req, res) => {
     const idOrder = req.params.idOrder
     const note = req.body.note
@@ -216,4 +263,4 @@ const updateNote = async (req, res) => {
         res.status(500).json({ message: "Error fetching updateNote " });
     }
 }
-module.exports = { createOrder, getAllOrder, getOrderFromTable, updateStatus, getOneOrder, updateOrder, updateNote }
+module.exports = { createOrder, getAllOrder, getOrderFromTable,getBestSellingDishes, updateStatus, getOneOrder, updateOrder, updateNote }

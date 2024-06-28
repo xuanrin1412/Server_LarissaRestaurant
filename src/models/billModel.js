@@ -4,7 +4,7 @@ const billSchema = new mongoose.Schema({
     orderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "order",
-        require: true
+        required: true
     },
     paymentMethod:{
         type: String,

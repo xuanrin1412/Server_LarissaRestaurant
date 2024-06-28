@@ -8,13 +8,13 @@ const tableSchema = new mongoose.Schema({
     },
     tableName: {
         type: String,
-        require: true,
+        required: true,
     },
     capacity: {
         type: Number,
-        require: true,
+        required: true,
     },
-    
+
 }, {
     timestamps: true,
     // unique: { // Unique constraint for tableName and areaId combined

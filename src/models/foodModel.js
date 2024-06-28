@@ -7,24 +7,24 @@ const foodSchema = new mongoose.Schema({
     },
     foodName: {
         type: String,
-        require: true,
+           required: true,
         unique: true,
     },
     description: {
         type: String,
-        require: true,
+           required: true,
     },
     picture: {
         type: String,
-        require: true,
+           required: true,
     },
     costPrice: {
         type: Number,
-        require: true,
+           required: true,
     },
     revenue: {
         type: Number,
-        require: true,
+           required: true,
     },
     favourite: {
         type: Boolean,

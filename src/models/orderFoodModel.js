@@ -4,20 +4,20 @@ const orderFoodSchema = new mongoose.Schema({
     foodId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "food",
-        require: true
+           required: true
     },
     orderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "order",
-        require: true
+           required: true
     },
     quantity: {
         type: Number,
-        require: true
+           required: true
     },
     totalEachFood: {
         type: Number,
-        require: true
+           required: true
     },
 })
 module.exports = mongoose.model("orderFood", orderFoodSchema)

@@ -6,7 +6,7 @@ function checkLogin(req, res, next) {
         req.user = decoded
         next()
     } else {
-        return res.json({ message: "You haven't login", result: [] })
+        return res.status(400).json({ message: "You haven't login", result: [] })
     }
 }
 module.exports = checkLogin

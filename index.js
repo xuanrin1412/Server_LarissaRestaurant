@@ -13,6 +13,7 @@ const areaRouter = require("./src/routers/areaRouter");
 const tableRouter = require("./src/routers/tableRouter");
 const billRouter = require("./src/routers/billRouter");
 const order_FoodRouter = require("./src/routers/order_FoodRouter");
+const bookATable = require("./src/routers/bookATableRouter");
 
 const app = express();
 const http = require("http");
@@ -64,8 +65,14 @@ app.use("/api/area", areaRouter);
 app.use("/api/table", tableRouter);
 app.use("/api/bill", billRouter);
 app.use("/api/order_food", order_FoodRouter);
+app.use("/api/book_a_table", bookATable);
 
 io.on('connection', (socket) => {
+    io.emit("hievent","xin chao")
+
+
+
+
     console.log(`User Connected: ${socket.id}`);
     // socket.on('join_admin_room', (adminId) => {
     //     socket.join('admin_room');

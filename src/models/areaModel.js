@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 const areaSchema = new mongoose.Schema({
     areaName: {
         type: String,
-        require: true,
+        required: true,
         unique: true,
     },
 }, {

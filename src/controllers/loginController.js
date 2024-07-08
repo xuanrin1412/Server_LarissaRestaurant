@@ -17,8 +17,9 @@ const handleLogin = async (req, res) => {
         if (hashedPassword === req.body.password) {
             const tokenJWT = jwt.sign(
                 {
-                    id: user._id,
+                    _id: user._id,
                     role: user.role,
+                    avatar: user.avatar,
                     userName: user.userName,
                     email: user.email,
                     phoneNumber: user.phoneNumber,

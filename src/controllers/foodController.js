@@ -10,6 +10,8 @@ const createFood = async (req, res) => {
     const { revenue } = req.body
     const { favourite } = req.body
     const { categoryId } = req.body
+    console.log("res body add food",req.body);
+    
     try {
         const newFood = await Food.create({
             foodName,
@@ -28,7 +30,7 @@ const createFood = async (req, res) => {
 }
 const getAllFood = async (req, res) => {
     try {
-        await Food.find({})
+        await Food.find({}).sort({ createdAt: -1 })
             .populate('categoryId', 'categoryName') // Chỉ lấy trường categoryName từ danh mục
             .then(foods => {
                 console.log(foods); // Danh sách các món ăn với thông tin danh mục (chỉ categoryName)

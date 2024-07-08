@@ -7,6 +7,10 @@ const userSchema = new mongoose.Schema({
         enum: roles,
         default: "user"
     },
+    avatar:{
+        type:String,
+        required:true,
+    },
     userName: {
         type: String,
         required: true,

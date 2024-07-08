@@ -1,11 +1,12 @@
 const express = require("express")
-const { createBookingATable } = require("../controllers/bookATableController.js")
+const { createBookingATable ,getAllBooking,getOneBooking,updateBookingStatus} = require("../controllers/bookATableController.js")
 const checkLogin = require('../middleware/checkLogin.js')
 
 const router = express.Router()
 router.post("/",createBookingATable)
-// router.get("/", checkLogin, getAllUser)
-// router.get("/find/:idUser", getUser)
+router.get("/",getAllBooking)
+router.get("/find/:idBooking", getOneBooking)
+router.put("/updateStatus/:idBooking", updateBookingStatus)
 // router.put("/:idUser", updateUser)
 // router.delete("/:idUser", deleteUser)
 

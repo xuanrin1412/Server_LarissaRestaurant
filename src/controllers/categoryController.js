@@ -12,13 +12,16 @@ const createCategory = async (req, res) => {
 
 
     } catch (error) {
-        console.error("Error:", error);
+        if (error.code === 11000) {
+            return res.status(400).json({ error: "Category name already exists." });
+        }
+
         return res.status(500).json({ error: error.message });
     }
 }
 const getAllCategory = async (req, res) => {
     try {
-        const getAllCategory = await Category.find({})
+        const getAllCategory = await Category.find().sort({ createdAt: -1 })
         res.status(200).json({ getAllCategory })
     } catch (error) {
         console.error("Error:", error);
@@ -28,12 +31,15 @@ const getAllCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
     const idCategory = req.params.idCategory
     try {
-        const deleteCategory = await Category.findByIdAndDelete({
-            _id: idCategory
-        })
-        res.status(200).json({ message: "Deleted Successfull", deleteCategory })
-
-
+        const findFoodFromCategory = await Food.findOne({ categoryId: idCategory })
+        if (findFoodFromCategory) {
+            return res.status(400).json({statusError:"Category have foods",  message: "You can't delete Category when have food" })
+        } else {
+            const deleteCategory = await Category.findByIdAndDelete({
+                _id: idCategory
+            })
+            res.status(200).json({ message: "Deleted Successfull", deleteCategory })
+        }
     } catch (error) {
         console.error("Error:", error);
         return res.status(500).json({ error: error.message });

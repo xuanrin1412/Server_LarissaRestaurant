@@ -1,24 +1,11 @@
 const mongoose = require("mongoose")
 
-// const roles = ["admin", "moderator", "user"]
+const statusOptions = ["Chưa xác nhận", "Đã xác nhận", "Đã chuẩn bị bàn"]
 const bookATableSchema = new mongoose.Schema({
-    // email: {
-    //     type: String,
-    //     unique: true
-    // },
-    // customerName: {
-    //     type: String,
-    //     require: true,
-    // },
-    // phoneNumber: {
-    //     type: String,
-    //     require: true,
-    //     unique: true,
-    // },
-    // address: {
-    //     type: String,
-    //     require: true,
-    // },
+    userInfo: {
+        type: Object,
+        required: true
+    },
     date: {
         type: String,
         required: true
@@ -37,6 +24,11 @@ const bookATableSchema = new mongoose.Schema({
     },
     note: {
         type: String,
+    },
+    status: {
+        type: String,
+        enum: statusOptions,
+        default: "Chưa xác nhận"
     }
 }, {
     timestamps: true

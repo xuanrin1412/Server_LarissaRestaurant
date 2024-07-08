@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 
 // ===============REGISTER===================
 const createUser = async (req, res) => {
+    const { avatar } = req.body
     const { userName } = req.body
     const { email } = req.body
     const { phoneNumber } = req.body
@@ -11,7 +12,7 @@ const createUser = async (req, res) => {
     const { address } = req.body
     const { role } = req.body
     try {
-        if (!userName || userName.trim().length === 0 || !email || email.trim().length === 0 || !password || password.trim().length === 0 || !phoneNumber || phoneNumber.length === 0 || !address || address.length === 0) {
+        if (!avatar || avatar.trim().length === 0 || !userName || userName.trim().length === 0 || !email || email.trim().length === 0 || !password || password.trim().length === 0 || !phoneNumber || phoneNumber.length === 0 || !address || address.length === 0) {
             return res.status(400).json({ message: "Please enter all required information" });
         }
         const userEmail = await User.findOne({ email })
@@ -30,6 +31,7 @@ const createUser = async (req, res) => {
             }
             const newUser = await User.create({
                 role,
+                avatar,
                 userName,
                 email,
                 phoneNumber,
@@ -83,6 +85,18 @@ const updateUser = async (req, res) => {
         console.log(err);
     }
 };
+// ===============UPDATE AVARTAR===================
+const updateAvatar = async (req, res) => {
+    const idUser = req.params.idUser
+    try {
+        const updateUserAvatar = await User.findOneAndUpdate({_id:idUser}, {avatar:req.body.avatar}, { new: true })
+        res.status(200).json({ updateUserAvatar });
+        console.log({ updateUserAvatar });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+};
 
 // ===============DELETE USER===================
 const deleteUser = async (req, res) => {
@@ -96,4 +110,4 @@ const deleteUser = async (req, res) => {
         console.log(err);
     }
 };
-module.exports = { createUser, getAllUser, getUser, updateUser, deleteUser }
+module.exports = { createUser, getAllUser, getUser, updateUser, deleteUser,updateAvatar }

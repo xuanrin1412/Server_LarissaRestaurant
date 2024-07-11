@@ -8,29 +8,35 @@ const orderSchema = new mongoose.Schema({
     tableId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "table",
-        required: true,
-    },
-    shipAdress: {
-        type: String
     },
     subTotal: {
         type: Number,
-        // require: true
-    },
-    deliveryFee: {
-        type: String
     },
     note: {
         type: String
     },
-    discount: {
-        type: Number
+    paymentIntentId: {
+        type: String
+    },
+    customerId: {
+        type: String
+    },
+    shipping: {
+        type: Object
+    },
+    delivery_status: {
+        type: String,
+        default: "pending"
     },
     statusPayment: {
         type: Boolean,
         default: false,
     },
-}, {
-    timestamps: true
-})
+    payment_status: {
+        type: String
+    },
+},
+    {
+        timestamps: true
+    })
 module.exports = mongoose.model("order", orderSchema)

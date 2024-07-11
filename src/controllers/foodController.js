@@ -48,7 +48,7 @@ const getAllFood = async (req, res) => {
 const getOneFood = async (req, res) => {
     const idFood = req.params.idFood
     try {
-        const getOneFood = await Food.findById({ _id: idFood })
+        const getOneFood = await Food.findById({ _id: idFood }).populate("categoryId")
         res.status(200).json({ getOneFood })
     } catch (error) {
         console.error("Error:", error);

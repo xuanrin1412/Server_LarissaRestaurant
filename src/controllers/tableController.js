@@ -46,7 +46,7 @@ const getTable = async (req, res) => {
 const updateTable = async (req, res) => {
     const idTable = req.params.idTable
     try {
-        const updateTable = await Table.findByIdAndUpdate({ _id: idTable })
+        const updateTable = await Table.findByIdAndUpdate({ _id: idTable }, { $set: req.body }, { new: true })
         res.status(200).json({ updateTable })
     } catch (error) {
         console.error(error);

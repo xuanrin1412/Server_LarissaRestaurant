@@ -6,13 +6,15 @@ const billSchema = new mongoose.Schema({
         ref: "order",
         required: true
     },
-    paymentMethod:{
+    paymentMethod: {
         type: String,
-        enum : ['cash','momo','bank'],
+        enum: ['cash', 'momo', 'bank'],
         default: 'cash'
     },
-    profit:{
-        type:Number,
-    }
+    profit: {
+        type: Number,
+    },
+}, {
+    timestamps: true
 })
 module.exports = mongoose.model("bill", billSchema)

@@ -84,6 +84,7 @@ const getAreaWithTable = async (req, res) => {
         const populatedAreas = await Promise.all(
             areas.map(async (area) => ({
                 areaName: area.areaName,
+                areaId: area._id,
                 table: await populateTableDetails(area._id),
             }))
         );

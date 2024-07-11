@@ -85,4 +85,4 @@ const updateBookingStatus = async (req, res) => {
 
 
 
-module.exports = { createBookingATable, getAllBooking,updateBookingStatus, getOneBooking }
+module.exports = { createBookingATable, getAllBooking, updateBookingStatus, getOneBooking }

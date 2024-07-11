@@ -4,16 +4,16 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 dotenv.config();
-
-const loginRouter = require("./src/routers/loginRouter");
+const { getWeeklyReport, getMonthlyReport, getYearlyReport } = require('./src/reportController');
+const order_FoodRouter = require("./src/routers/order_FoodRouter");
 const registerRouter = require("./src/routers/registerRouter");
 const categoryRouter = require("./src/routers/categoryRouter");
+const bookATable = require("./src/routers/bookATableRouter");
+const tableRouter = require("./src/routers/tableRouter");
+const loginRouter = require("./src/routers/loginRouter");
 const foodRouter = require("./src/routers/foodRouter");
 const areaRouter = require("./src/routers/areaRouter");
-const tableRouter = require("./src/routers/tableRouter");
 const billRouter = require("./src/routers/billRouter");
-const order_FoodRouter = require("./src/routers/order_FoodRouter");
-const bookATable = require("./src/routers/bookATableRouter");
 const ngrok = require('ngrok');
 const app = express();
 const http = require("http");
@@ -22,6 +22,9 @@ const cors = require('cors');
 const axios = require('axios');
 const crypto = require('crypto');
 const uploadImage = require('./src/uploadImage');
+const Order = require('./src/models/OrderModel');
+const foodModel = require('./src/models/foodModel');
+const orderFoodModel = require('./src/models/orderFoodModel');
 const port = 3004;
 
 const server = http.createServer(app);
@@ -44,8 +47,6 @@ app.use(cors({
     origin: "http://localhost:5173",
     credentials: true,
 }));
-
-
 
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -78,7 +79,6 @@ app.use("/api/bill", billRouter);
 app.use("/api/order_food", order_FoodRouter);
 app.use("/api/book_a_table", bookATable);
 
-
 var accessKey = 'F8BBA842ECF85';
 var secretKey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz';
 
@@ -86,7 +86,6 @@ app.post("/payment", async (req, res) => {
     console.log("api/payment res", req.body);
     //https://developers.momo.vn/#/docs/en/aiov2/?id=payment-method
     //parameters
-
     var orderInfo = 'Pay with MoMo';
     var partnerCode = 'MOMO';
     var redirectUrl = 'http://localhost:5173/order';//thanh toan xong nhay vao cai nay
@@ -174,14 +173,12 @@ app.post("/transaction-status", async (req, res) => {
             }
         });
 
-
         res.status(200).json({ transactionStatus: response.data });
     } catch (error) {
         console.log(`Problem with request transactionStatus: ${error.message}`);
         res.status(500).json({ message: 'Internal Server Error TransactionStatus', error: error.message });
     }
 });
-
 
 // UPLOAD IMAGES
 app.post("/uploadImage", (req, res) => {
@@ -196,6 +193,173 @@ app.post("/uploadImage", (req, res) => {
             res.status(500).send(err)
         })
 })
+
+// REPORT
+// app.get('/report/weekly', async (req, res) => {
+//     const { startDate, endDate } = req.query;
+//     try {
+//         const report = await getWeeklyReport(new Date(startDate), new Date(endDate));
+//         res.status(200).json({ message: "Report month", report })
+//     } catch (error) {
+//         console.error("Error:", error);
+//         return res.status(500).json({ message: "Error fetching get weekly report", error });
+//     }
+// });
+
+// // Lấy báo cáo theo tháng
+// app.get('/report/monthly', async (req, res) => {
+//     const { year, month } = req.query;
+//     const report = await getMonthlyReport(Number(year), Number(month));
+//     res.json(report);
+// });
+
+// // Lấy báo cáo theo năm
+// app.get('/report/yearly', async (req, res) => {
+//     const { year } = req.query;
+//     const report = await getYearlyReport(Number(year));
+//     res.json(report);
+// });
+
+
+// ====================================STRIPE PAYMENT=====================================
+const stripe = require('stripe')(
+    'sk_test_51O2BltBMGimvwHpfwLaGyRdtTot5eiFmZyhoVtj2rQxPIbDKjhVleznekZK7gC43bBJkdLHii2hvhqoTAM43Z9y300aIVmFXvJ',
+)
+console.log('stripe', stripe)
+
+// checkout api
+app.post('/api/create-checkout-session', async (req, res) => {
+    const { products } = req.body
+    const customer = await stripe.customers.create({
+        metadata: {
+            userId: req.body.userId,
+            cart: JSON.stringify(products.map(p => ({ foodId: p.food._id, quantity: p.quantity })))
+        }
+    })
+    console.log(' req.body index', req.body)
+    const lineItems = products.map(product => ({
+        price_data: {
+            currency: 'vnd',
+            product_data: {
+                name: product.food.foodName, // This is the missing property
+                images: [product.food.picture],
+            },
+            unit_amount: product.food.revenue,
+        },
+        quantity: product.quantity,
+    }))
+    console.log('lineItems', lineItems)
+
+    const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: lineItems,
+        customer: customer.id,
+        mode: 'payment',
+        success_url: 'http://localhost:5173/success',
+        cancel_url: 'http://localhost:5173/cancel',
+        billing_address_collection: 'required',
+        shipping_address_collection: {
+            allowed_countries: ['VN'],
+        },
+        phone_number_collection: {
+            enabled: true,
+        },
+    })
+
+    res.json({ id: session.id })
+})
+
+
+// =============================STRIPR WEBHOOK=================================================
+//CREATE ORDER 
+const createOrderCustomer = async (customer, data) => {
+    const Items = JSON.parse(customer.metadata.cart);
+    try {
+        const newOrder = await Order.create({
+            userId: customer.metadata.userId,
+            customerId: data.customer,
+            paymentIntentId: data.payment_intent,
+            subTotal: data.amount_subtotal,
+            shipping: data.customer_details,
+            payment_status: data.payment_status,
+        });
+        console.log("newOrder", newOrder);
+
+        // add food
+        const orderId = newOrder._id.toHexString();
+        const addFoodPromises = Items.map(async food => {
+            const foodData = await foodModel.findById(food.foodId);
+            const totalEachFood = foodData.revenue * food.quantity;
+            return orderFoodModel.create({
+                foodId: food.foodId,
+                orderId: orderId,
+                quantity: food.quantity,
+                totalEachFood: totalEachFood,
+            });
+        });
+        console.log("addFoodPromises=====", addFoodPromises);
+        const populatedFoodsArr = await orderFoodModel.find({ orderId: orderId }).populate('foodId');
+        const populatedNewOrder = await Order.find({ orderId: orderId }).populate({
+            path: 'userId',
+            select: '-password'
+        });
+        const orderFromCustomer = {
+            food: populatedFoodsArr,
+            order: populatedNewOrder
+        }
+        // res.status(200).json({ orderFromCustomer })
+        console.log("orderFromCustomer", orderFromCustomer);
+    } catch (error) {
+        console.log("Edrror create order", error);
+    }
+}
+
+
+
+
+
+// This is your Stripe CLI webhook secret for testing your endpoint locally.
+let endpointSecret;
+
+//endpointSecret= "whsec_28d8c59ff93f134810310db47156b84744bb5ea76164c209bb5ad9165bdd8255";
+
+app.post('/stripe/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let data;
+    let eventType;
+    if (endpointSecret) {
+        let event;
+        try {
+            event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+            console.log("webhook verified.");
+        } catch (err) {
+            console.log(`Webhook Error: ${err.message}`);
+            response.status(400).send(`Webhook Error: ${err.message}`);
+            return;
+        }
+        data = event.data.object;
+        eventType = event.type
+    } else {
+        data = req.body.data.object;
+        eventType = req.body.type
+    }
+
+    //handle event
+    if (eventType === "checkout.session.completed") {
+        stripe.customers
+            .retrieve(data.customer)
+            .then((customer) => {
+                console.log("customer tt", customer);
+                console.log("customer dd", data);
+
+                createOrderCustomer(customer, data)
+            })
+            .catch((err) => {
+                console.log(err.message);
+            })
+    }
+    res.send().end()
+});
 
 
 

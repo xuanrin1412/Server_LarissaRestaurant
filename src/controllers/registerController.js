@@ -60,6 +60,17 @@ const getAllUser = async (req, res) => {
         console.log(err);
     }
 };
+
+// ===============GET ALL MODERATOR===================
+const getAllModerator = async (req, res) => {
+    try {
+        const getAllModerator = await User.find({ role: "moderator" })
+        res.status(200).json({ getAllModerator });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+        console.log(err);
+    }
+};
 // ===============GET ONE USER===================
 const getUser = async (req, res) => {
     const idUser = req.params.idUser
@@ -89,7 +100,7 @@ const updateUser = async (req, res) => {
 const updateAvatar = async (req, res) => {
     const idUser = req.params.idUser
     try {
-        const updateUserAvatar = await User.findOneAndUpdate({_id:idUser}, {avatar:req.body.avatar}, { new: true })
+        const updateUserAvatar = await User.findOneAndUpdate({ _id: idUser }, { avatar: req.body.avatar }, { new: true })
         res.status(200).json({ updateUserAvatar });
         console.log({ updateUserAvatar });
     } catch (err) {
@@ -110,4 +121,4 @@ const deleteUser = async (req, res) => {
         console.log(err);
     }
 };
-module.exports = { createUser, getAllUser, getUser, updateUser, deleteUser,updateAvatar }
+module.exports = { createUser,getAllModerator, getAllUser, getUser, updateUser, deleteUser, updateAvatar }

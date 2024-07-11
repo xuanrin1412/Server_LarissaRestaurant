@@ -52,10 +52,10 @@ const createOrder = async (req, res) => {
             });
             console.log("foodsArr", foodsArr)
 
-            const table = await Table.findById({_id:tableId})
+            const table = await Table.findById({ _id: tableId })
             const tableName = table.tableName
             // console.log("table=>",table.tableName);
-            
+
             io.emit('new_order', {
                 message: tableName + " have Order"
             });
@@ -263,4 +263,4 @@ const updateNote = async (req, res) => {
         res.status(500).json({ message: "Error fetching updateNote " });
     }
 }
-module.exports = { createOrder, getAllOrder, getOrderFromTable,getBestSellingDishes, updateStatus, getOneOrder, updateOrder, updateNote }
+module.exports = { createOrder, getAllOrder, getOrderFromTable, getBestSellingDishes, updateStatus, getOneOrder, updateOrder, updateNote }

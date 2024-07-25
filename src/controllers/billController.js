@@ -54,7 +54,7 @@ const createBill = async (req, res) => {
 
 const getAllBill = async (req, res) => {
     try {
-        const bills = await Bill.find().populate('orderId')
+        const bills = await Bill.find().populate('orderId').sort({ createdAt: -1 })
         const detailedBills = await Promise.all(bills.map(async bill => {
             const foodOrderDetail = await Bill.findById(bill._id)
                 .populate({

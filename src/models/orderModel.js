@@ -11,6 +11,7 @@ const orderSchema = new mongoose.Schema({
     },
     subTotal: {
         type: Number,
+        // require: true
     },
     note: {
         type: String
@@ -35,6 +36,9 @@ const orderSchema = new mongoose.Schema({
     payment_status: {
         type: String
     },
+    // paymentIntentId: {
+    //     type: String
+    // },
 },
     {
         timestamps: true

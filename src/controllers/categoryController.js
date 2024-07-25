@@ -13,7 +13,7 @@ const createCategory = async (req, res) => {
 
     } catch (error) {
         if (error.code === 11000) {
-            return res.status(400).json({ error: "Category name already exists." });
+            return res.status(400).json({ error: "Tên danh mục món ăn bị trùng *" });
         }
 
         return res.status(500).json({ error: error.message });
@@ -33,7 +33,7 @@ const deleteCategory = async (req, res) => {
     try {
         const findFoodFromCategory = await Food.findOne({ categoryId: idCategory })
         if (findFoodFromCategory) {
-            return res.status(400).json({statusError:"Category have foods",  message: "You can't delete Category when have food" })
+            return res.status(400).json({ statusError: "Category have foods", message: "You can't delete Category when have food" })
         } else {
             const deleteCategory = await Category.findByIdAndDelete({
                 _id: idCategory
@@ -52,6 +52,9 @@ const updateCategory = async (req, res) => {
         res.status(200).json({ message: "Updated Successfull", updateCategory })
     } catch (error) {
         console.error("Error:", error);
+        if (error.code === 11000) { // Kiểm tra lỗi trùng lặp khóa
+            return res.status(400).json({ error: "Cập nhật thất bại bị trùng tên danh mục món ăn !" });
+        }
         return res.status(500).json({ error: error.message });
     }
 }

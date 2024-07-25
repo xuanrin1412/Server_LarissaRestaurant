@@ -57,7 +57,7 @@ const createOrder = async (req, res) => {
             // console.log("table=>",table.tableName);
 
             io.emit('new_order', {
-                message: tableName + " have Order"
+                message: tableName + " có Order"
             });
             res.status(200).json({
                 message: "Created order Successfully OFFLINE",
@@ -193,8 +193,14 @@ const updateOrder = async (req, res) => {
             })
             updateFoodsApi.push(updateFoods)
         }
-        io.emit('new_order', {
-            message: "Table have Order"
+
+        const getTableUpdate = await Order.findById({ _id: idOrder }).populate('tableId');
+        console.log("getTableUpdate", getTableUpdate.tableId.tableName);
+
+        // const table = await Table.findById({ _id: tableId })
+        const tableName = getTableUpdate.tableId.tableName
+        io.emit('update_order', {
+            message: tableName + " đã thay đổi món ăn!"
         });
         res.status(200).json({ total, updateFoodsApi, listUpdateQuanFoods, oldFoods, listOldFoods, listAddNewFoods, newFoods, listIdRemoveFoods })
     } catch (error) {

@@ -12,7 +12,7 @@ const createUser = async (req, res) => {
     const { address } = req.body
     const { role } = req.body
     try {
-        if (!avatar || avatar.trim().length === 0 || !userName || userName.trim().length === 0 || !email || email.trim().length === 0 || !password || password.trim().length === 0 || !phoneNumber || phoneNumber.length === 0 || !address || address.length === 0) {
+        if (!userName || userName.trim().length === 0 || !email || email.trim().length === 0 || !password || password.trim().length === 0 || !phoneNumber || phoneNumber.length === 0 || !address || address.length === 0) {
             return res.status(400).json({ message: "Please enter all required information" });
         }
         const userEmail = await User.findOne({ email })
@@ -21,9 +21,9 @@ const createUser = async (req, res) => {
         if (userEmail) {
             return res.status(400).json({ message: 'Email đã tồn tại' })
         } else if (userNameD) {
-            return res.status(400).json({ message: 'User Name đã tồn tại' })
+            return res.status(400).json({ message: 'Tên người dùng đã tồn tại' })
         } else if (userPhoneD) {
-            return res.status(400).json({ message: 'Phone Number đã tồn tại' })
+            return res.status(400).json({ message: 'Số điện thoại đã tồn tại' })
         } else {
             let encryptedPassword = password;
             if (password) {
@@ -38,7 +38,7 @@ const createUser = async (req, res) => {
                 address,
                 password: encryptedPassword
             });
-            res.status(200).json({ newUser, message: 'Register successful' })
+            res.status(200).json({ newUser, message: 'Đăng ký thành công' })
             console.log('newUser', newUser)
         }
     } catch (err) {
@@ -53,7 +53,7 @@ const getAllUser = async (req, res) => {
     console.log("user getAllUser", user);
 
     try {
-        const getAllUser = await User.find({})
+        const getAllUser = await User.find({}).sort({ createdAt: -1 });
         res.status(200).json({ getAllUser });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -64,7 +64,7 @@ const getAllUser = async (req, res) => {
 // ===============GET ALL MODERATOR===================
 const getAllModerator = async (req, res) => {
     try {
-        const getAllModerator = await User.find({ role: "moderator" })
+        const getAllModerator = await User.find({ role: "moderator" }).sort({ createdAt: -1 });
         res.status(200).json({ getAllModerator });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -86,11 +86,29 @@ const getUser = async (req, res) => {
 
 // ===============UPDATE USER===================
 const updateUser = async (req, res) => {
+    const { avatar } = req.body
+    const { userName } = req.body
+    const { email } = req.body
+    const { phoneNumber } = req.body
+    const { password } = req.body
+    const { address } = req.body
     const idUser = req.params.idUser
     try {
+        // const userEmail = await User.findOne({ email })
+        // const userNameD = await User.findOne({ userName })
+        // const userPhoneD = await User.findOne({ phoneNumber })
+        // if (userNameD) {
+        //     return res.status(400).json({ message: 'Tên người dùng đã tồn tại' })
+        // } else if (userEmail) {
+        //     return res.status(400).json({ message: 'Email đã tồn tại' })
+        // } else if (userPhoneD) {
+        //     return res.status(400).json({ message: 'Phone Number đã tồn tại' })
+        // } else {
         const updateUser = await User.findByIdAndUpdate(idUser, { $set: req.body }, { new: true })
         res.status(200).json({ updateUser });
         console.log({ updateUser });
+        // }
+
     } catch (err) {
         res.status(500).json({ error: err.message });
         console.log(err);
@@ -121,4 +139,4 @@ const deleteUser = async (req, res) => {
         console.log(err);
     }
 };
-module.exports = { createUser,getAllModerator, getAllUser, getUser, updateUser, deleteUser, updateAvatar }
+module.exports = { createUser, getAllModerator, getAllUser, getUser, updateUser, deleteUser, updateAvatar }

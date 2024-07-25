@@ -11,11 +11,10 @@ const createArea = async (req, res) => {
         res.status(200).json({ message: "Created Successfully", newArea });
     } catch (error) {
         console.error("Error:", error);
-        
-        if (error.code === 11000) { // Kiểm tra lỗi trùng lặp khóa
-            return res.status(400).json({ error: "Duplicate key error: An area with this name already exists." });
-        }
 
+        if (error.code === 11000) { // Kiểm tra lỗi trùng lặp khóa
+            return res.status(400).json({ error: "Tên khu vực bị trùng *" });
+        }
         return res.status(500).json({ error: error.message });
     }
 };

@@ -52,12 +52,8 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 // app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.json({
-    limit: '25mb'
-}));
-app.use(express.urlencoded({
-    limit: '25mb'
-}));
+app.use(bodyParser.json({ limit: "50mb" })); // Adjust the limit as needed
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 // Middleware để truyền `io` đến các route handlers
 app.use((req, res, next) => {
     req.io = io;
@@ -274,6 +270,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
 //CREATE ORDER 
 const createOrderCustomer = async (customer, data) => {
     const Items = JSON.parse(customer.metadata.cart);
+    console.log({customer});
+    
     try {
         const newOrder = await Order.create({
             userId: customer.metadata.userId,
@@ -325,6 +323,8 @@ let endpointSecret;
 
 app.post('/stripe/webhook', express.raw({ type: 'application/json' }), (req, res) => {
     const sig = req.headers['stripe-signature'];
+    console.log("Hello Huuu");
+    
     let data;
     let eventType;
     if (endpointSecret) {
@@ -345,7 +345,10 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), (req, res
     }
 
     //handle event
+    console.log({eventType});
+    
     if (eventType === "checkout.session.completed") {
+        
         stripe.customers
             .retrieve(data.customer)
             .then((customer) => {

@@ -7,7 +7,7 @@ const handleLogin = async (req, res) => {
     try {
         const user = await User.findOne({ userName: req.body.userName });
         if (!user) {
-            return res.status(404).json({ message: "Uesr does not exist !!!" });
+            return res.status(404).json({ message: "Users does not exist !!!" });
         }
         const hashedPassword = CryptoJS.AES.decrypt(
             user.password,
